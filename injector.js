@@ -1,361 +1,289 @@
 /**
  * ============================================================
- * NOCTURNAL OMNI: ULTIMATE EDITION (V4.2)
+ * NOCTURNAL OMNI: RGB TITAN EDITION (V7.0 - UNLEASHED)
  * ------------------------------------------------------------
- * Features: Mic Maximizer, 3-Band EQ, Saturation, 
- * System Controls, and Neon "Universal God" Aesthetics.
+ * Branding: Nocturnal Omni (Automated Style)
+ * Power: 100x Gain Multiplier (NO HARD LIMITER)
+ * Theme: RGB Neon (Red, Blue, Green)
+ * Length: 250+ Lines for Maximum Stability & Enhancement
  * ============================================================
  */
 
 (function() {
     "use strict";
 
-    console.log("[Nocturnal Omni] Initializing high-performance audio engine...");
+    console.log("%c[Nocturnal Omni]%c Initializing RGB TITAN Engine...", "color: #ff0000; font-weight: bold;", "color: #fff;");
 
     // ==========================================
-    // 1. AUDIO CONTEXT & CORE NODES
+    // 1. ADVANCED AUDIO CONTEXT INITIALIZATION
     // ==========================================
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     
-    // Core Gain and Dynamics
-    const gainNode = audioCtx.createGain();
+    // TRIPLE-STAGE POWER ARCHITECTURE (For 100x Volume)
+    // Stage 1: Initial Input Boost
+    const preAmp = audioCtx.createGain();   
+    // Stage 2: Main Processing Power
+    const powerAmp = audioCtx.createGain(); 
+    // Stage 3: Final Master Output (Dangerous Levels)
+    const masterVol = audioCtx.createGain(); 
+
+    // DYNAMICS PROCESSING
     const mainComp = audioCtx.createDynamicsCompressor();
-    const loudnessDrive = audioCtx.createDynamicsCompressor();
-    const limiter = audioCtx.createDynamicsCompressor();
-    
-    // Saturation / Distortion Node
+    const driveStage = audioCtx.createDynamicsCompressor();
     const saturationNode = audioCtx.createWaveShaper();
 
-    // 3-Band Equalizer Nodes
+    // PRECISION FREQUENCY EQUALIZERS
     const bassEq = audioCtx.createBiquadFilter();
     const presenceEq = audioCtx.createBiquadFilter();
     const trebleEq = audioCtx.createBiquadFilter();
-    const masterClarityEq = audioCtx.createBiquadFilter();
+    const highDefClarity = audioCtx.createBiquadFilter();
 
     // ==========================================
-    // 2. NODE CONFIGURATIONS
+    // 2. DETAILED NODE CALIBRATION
     // ==========================================
     
-    // EQ Initial Settings
+    // Bass Hardware Simulation (60Hz)
     bassEq.type = "lowshelf";
-    bassEq.frequency.value = 100;
+    bassEq.frequency.value = 60;
 
+    // Presence / Vocal Definition (3kHz)
     presenceEq.type = "peaking";
     presenceEq.frequency.value = 3000;
-    presenceEq.Q.value = 1.0;
+    presenceEq.Q.value = 1.5;
 
+    // Treble / Air (12kHz)
     trebleEq.type = "highshelf";
-    trebleEq.frequency.value = 8000;
+    trebleEq.frequency.value = 12000;
 
-    masterClarityEq.type = "peaking";
-    masterClarityEq.frequency.value = 3000;
-    masterClarityEq.gain.value = 5;
+    // High-Def Clarity Focus (4.5kHz)
+    highDefClarity.type = "peaking";
+    highDefClarity.frequency.value = 4500;
+    highDefClarity.gain.value = 12; // Default clarity boost
 
-    // Compressor Defaults
-    mainComp.threshold.value = -24;
-    mainComp.ratio.value = 4;
-    mainComp.attack.value = 0.003;
-    mainComp.release.value = 0.25;
-
-    // Limiter Defaults (Safety)
-    limiter.threshold.value = -1;
-    limiter.ratio.value = 20;
+    // Compression Logic for "Thick" Sound
+    mainComp.threshold.value = -45;
+    mainComp.ratio.value = 20;
+    mainComp.attack.value = 0.001;
+    mainComp.release.value = 0.15;
 
     // ==========================================
-    // 3. AUDIO ROUTING (The Chain)
+    // 3. AUDIO ROUTING GRAPH (NO LIMITER)
     // ==========================================
-    // Source -> Clarity -> Bass -> Presence -> Treble -> Saturation -> Comp -> Loudness -> Gain -> Limiter -> Out
-    masterClarityEq.connect(bassEq);
+    // Sequence: Clarity -> EQ Path -> Saturation -> Compression -> Triple Gain Path
+    highDefClarity.connect(bassEq);
     bassEq.connect(presenceEq);
     presenceEq.connect(trebleEq);
     trebleEq.connect(saturationNode);
     saturationNode.connect(mainComp);
-    mainComp.connect(loudnessDrive);
-    loudnessDrive.connect(gainNode);
-    gainNode.connect(limiter);
-    limiter.connect(audioCtx.destination);
+    mainComp.connect(driveStage);
+    driveStage.connect(preAmp);
+    preAmp.connect(powerAmp);
+    powerAmp.connect(masterVol);
+    
+    // THE UNLEASHED BRIDGE: Direct to output without Limiter safety
+    masterVol.connect(audioCtx.destination);
 
     // ==========================================
-    // 4. UI CONSTRUCTION (NOCTURNAL OMNI STYLE)
+    // 4. UI CONSTRUCTION (RGB NEON AUTOMATED)
     // ==========================================
     const panel = document.createElement("div");
-    panel.id = "nocturnal-omni-panel";
+    panel.id = "nocturnal-omni-v7";
     
-    // Header with Neon Branding
+    // Internal HTML Structure with Automated Branding
     panel.innerHTML = `
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid #7c12f7; padding-bottom:8px;">
-            <div style="font-weight:bold; font-size:18px; color:#fff; text-shadow: 0 0 10px #7c12f7, 0 0 20px #7c12f7;">
-                NOCTURNAL <span style="color:#f712f7;">OMNI</span>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; border-bottom:3px solid #ff0000; padding-bottom:10px;">
+            <div style="font-weight:900; font-size:20px; color:#ff0000; text-shadow: 0 0 15px #ff0000; font-family: 'Arial Black', sans-serif;">
+                NOCTURNAL <span style="color:#00ff00;">OMNI</span>
             </div>
-            <div style="font-size:9px; color:#00e5ff; letter-spacing:1px; font-weight:bold; animation: blink 1.5s infinite;">
-                WAITING FOR MIC
+            <div style="text-align:right;">
+                <div style="font-size:10px; color:#0000ff; font-weight:bold; letter-spacing:1px;">ENGINE: ACTIVE</div>
+                <div style="font-size:8px; color:#fff; opacity:0.6;">LIMITER: DISENGAGED</div>
             </div>
         </div>
         <style>
-            @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
-            #nocturnal-omni-panel::-webkit-scrollbar { width: 4px; }
-            #nocturnal-omni-panel::-webkit-scrollbar-thumb { background: #7c12f7; border-radius: 10px; }
+            #nocturnal-omni-v7::-webkit-scrollbar { width: 5px; }
+            #nocturnal-omni-v7::-webkit-scrollbar-track { background: #000; }
+            #nocturnal-omni-v7::-webkit-scrollbar-thumb { background: linear-gradient(#ff0000, #00ff00, #0000ff); border-radius: 10px; }
+            .rgb-slider { -webkit-appearance: none; width: 100%; height: 5px; border-radius: 5px; background: #111; outline: none; margin: 10px 0; }
+            .rgb-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 15px; height: 15px; border-radius: 50%; cursor: pointer; border: 2px solid #fff; }
         </style>
     `;
 
-    // Panel Container Style
+    // Advanced Panel Styling
     Object.assign(panel.style, {
-        position: "fixed",
-        top: "40px",
-        right: "25px",
-        zIndex: "10000",
-        width: "320px",
-        padding: "20px",
-        borderRadius: "12px",
-        background: "rgba(8, 4, 15, 0.98)",
-        border: "2px solid #7c12f7",
-        color: "#fff",
-        fontFamily: "'Courier New', Courier, monospace",
-        boxShadow: "0 0 30px rgba(124, 18, 247, 0.6)",
-        maxHeight: "85vh",
-        overflowY: "auto",
-        userSelect: "none"
+        position: "fixed", top: "30px", right: "30px", zIndex: "20000",
+        width: "340px", padding: "25px", borderRadius: "8px",
+        background: "rgba(5, 5, 5, 0.98)", border: "2px solid #0000ff",
+        color: "#fff", fontFamily: "'Courier New', Courier, monospace",
+        boxShadow: "0 0 40px rgba(255, 0, 0, 0.7)", maxHeight: "90vh", overflowY: "auto",
+        transition: "box-shadow 0.5s ease-in-out"
     });
 
     document.body.appendChild(panel);
 
     // ==========================================
-    // 5. SLIDER & COMPONENT BUILDERS
+    // 5. ENHANCED COMPONENT FACTORY
     // ==========================================
     
-    function addSectionHeader(title) {
-        const header = document.createElement("div");
-        header.innerText = title;
-        header.style.cssText = `
-            color: #00e5ff;
-            font-size: 11px;
-            margin: 20px 0 10px 0;
-            border-bottom: 1px solid #333;
-            padding-bottom: 4px;
-            font-weight: bold;
-            text-transform: uppercase;
-        `;
-        panel.appendChild(header);
+    /**
+     * Creates a Category Header with RGB accents
+     */
+    function addSection(title, color) {
+        const h = document.createElement("div");
+        h.innerText = title;
+        h.style.cssText = `color:${color}; font-size:12px; margin:25px 0 12px 0; border-bottom:1px solid #444; padding-bottom:5px; font-weight:bold; letter-spacing:1.5px;`;
+        panel.appendChild(h);
     }
 
-    function createPremiumSlider(label, min, max, initialValue, callback) {
-        const container = document.createElement("div");
-        container.style.marginBottom = "14px";
+    /**
+     * Creates a High-Performance Slider for audio control
+     */
+    function buildSlider(label, min, max, def, color, callback) {
+        const wrapper = document.createElement("div");
+        wrapper.style.marginBottom = "18px";
 
-        const labelRow = document.createElement("div");
-        labelRow.style.cssText = "display:flex; justify-content:space-between; font-size:10px; color:#f712f7; margin-bottom:5px; font-weight:bold;";
+        const info = document.createElement("div");
+        info.style.cssText = `display:flex; justify-content:space-between; font-size:11px; color:${color}; font-weight:bold; margin-bottom:6px;`;
         
-        const labelText = document.createElement("span");
-        labelText.innerText = label.toUpperCase();
+        const name = document.createElement("span");
+        name.innerText = label.toUpperCase();
         
-        const valueDisplay = document.createElement("span");
-        valueDisplay.innerText = initialValue;
-        valueDisplay.style.color = "#fff";
-        
-        labelRow.appendChild(labelText);
-        labelRow.appendChild(valueDisplay);
+        const value = document.createElement("span");
+        value.id = `val-id-${label}`;
+        value.innerText = def;
+        value.style.color = "#fff";
 
-        const slider = document.createElement("input");
-        slider.type = "range";
-        slider.min = min;
-        slider.max = max;
-        slider.step = "0.1";
-        slider.value = initialValue;
-        
-        Object.assign(slider.style, {
-            width: "100%",
-            height: "4px",
-            background: "#1a1a1a",
-            outline: "none",
-            borderRadius: "2px",
-            appearance: "none",
-            cursor: "pointer",
-            accentColor: "#f712f7"
-        });
+        info.appendChild(name);
+        info.appendChild(value);
 
-        slider.oninput = () => {
-            const val = parseFloat(slider.value);
-            valueDisplay.innerText = val;
-            callback(val);
+        const input = document.createElement("input");
+        input.type = "range";
+        input.min = min;
+        input.max = max;
+        input.step = "0.1";
+        input.value = def;
+        input.className = "rgb-slider";
+        input.style.accentColor = color;
+
+        input.oninput = () => {
+            const v = parseFloat(input.value);
+            value.innerText = v;
+            callback(v);
+            // Pulsing effect on change
+            panel.style.boxShadow = `0 0 50px ${color}`;
+            setTimeout(() => panel.style.boxShadow = "0 0 40px rgba(255, 0, 0, 0.7)", 200);
         };
 
-        container.appendChild(labelRow);
-        container.appendChild(slider);
-        panel.appendChild(container);
+        wrapper.appendChild(info);
+        wrapper.appendChild(input);
+        panel.appendChild(wrapper);
     }
 
     // ==========================================
-    // 6. MIC MAXIMIZER CONTROLS (SCREENSHOT MAPPED)
+    // 6. MASTER CONTROLS (THE SCREENSHOT OPTIONS)
     // ==========================================
     
-    addSectionHeader("1. Android 14 Exploits (Core)");
-    
-    createPremiumSlider("Gain (dB Boost)", -20, 20, 0, (val) => {
-        gainNode.gain.value = Math.pow(10, val / 20);
-    });
+    addSection("1. RAW AMPLIFICATION [RED]", "#ff0000");
+    buildSlider("Master Power", 0, 100, 1, "#ff0000", v => masterVol.gain.value = v);
+    buildSlider("Pre-Amp Drive", 0, 100, 1, "#ff0000", v => preAmp.gain.value = v);
+    buildSlider("Power Stage", 0, 100, 1, "#ff0000", v => powerAmp.gain.value = v);
+    buildSlider("Loudness Drive", -60, 20, -24, "#ff0000", v => driveStage.threshold.value = v);
 
-    createPremiumSlider("Loudness Drive", -60, 0, -24, (val) => {
-        loudnessDrive.threshold.value = val;
-    });
-
-    createPremiumSlider("Saturation Drive", 0, 100, 0, (val) => {
-        if (val === 0) {
-            saturationNode.curve = null;
-        } else {
-            const n_samples = 44100;
-            const curve = new Float32Array(n_samples);
-            const deg = Math.PI / 180;
-            for (let i = 0; i < n_samples; ++i) {
-                const x = (i * 2) / n_samples - 1;
-                curve[i] = ((3 + val) * x * 20 * deg) / (Math.PI + val * Math.abs(x));
-            }
-            saturationNode.curve = curve;
+    addSection("2. SIGNAL DEFINITION [BLUE]", "#0000ff");
+    buildSlider("Clarity Focus", -50, 50, 12, "#0000ff", v => highDefClarity.gain.value = v);
+    buildSlider("Comp Threshold", -100, 0, -45, "#0000ff", v => mainComp.threshold.value = v);
+    buildSlider("Comp Ratio", 1, 50, 20, "#0000ff", v => mainComp.ratio.value = v);
+    buildSlider("Saturation", 0, 300, 0, "#0000ff", v => {
+        const n = 44100; const curve = new Float32Array(n);
+        const deg = Math.PI / 180;
+        for (let i = 0; i < n; ++i) { 
+            let x = (i * 2) / n - 1; 
+            curve[i] = ((3 + v) * x * 20 * deg) / (Math.PI + v * Math.abs(x)); 
         }
+        saturationNode.curve = v > 0 ? curve : null;
     });
 
-    addSectionHeader("2. Raw Math Boosting (Dynamics)");
-
-    createPremiumSlider("Comp Threshold (dB)", -60, 0, -24, (val) => {
-        mainComp.threshold.value = val;
-    });
-
-    createPremiumSlider("Comp Ratio", 1, 20, 4, (val) => {
-        mainComp.ratio.value = val;
-    });
-
-    addSectionHeader("3. Native Frequency EQs");
-
-    createPremiumSlider("Hardware Sub Quake (60Hz)", -20, 20, 0, (val) => {
-        bassEq.gain.value = val;
-    });
-
-    createPremiumSlider("Ear Pierce (3kHz)", -20, 20, 0, (val) => {
-        presenceEq.gain.value = val;
-    });
-
-    createPremiumSlider("Treble Air (10kHz)", -20, 20, 0, (val) => {
-        trebleEq.gain.value = val;
-    });
+    addSection("3. NATIVE FREQUENCY [GREEN]", "#00ff00");
+    buildSlider("Sub Quake (60Hz)", -60, 60, 0, "#00ff00", v => bassEq.gain.value = v);
+    buildSlider("Presence (3kHz)", -60, 60, 0, "#00ff00", v => presenceEq.gain.value = v);
+    buildSlider("Air Boost (12kHz)", -60, 60, 0, "#00ff00", v => trebleEq.gain.value = v);
 
     // ==========================================
-    // 7. SYSTEM & UTILITY FEATURES
+    // 7. SYSTEM UTILITIES & AUTOMATION
     // ==========================================
     
-    addSectionHeader("4. System & Global Settings");
+    addSection("4. ENGINE UTILITY", "#ffffff");
+    const grid = document.createElement("div");
+    grid.style.display = "grid"; grid.style.gridTemplateColumns = "1fr 1fr"; grid.style.gap = "12px";
 
-    const systemGrid = document.createElement("div");
-    systemGrid.style.display = "grid";
-    systemGrid.style.gridTemplateColumns = "1fr 1fr";
-    systemGrid.style.gap = "10px";
-    systemGrid.style.marginTop = "10px";
-
-    function createSystemButton(text, onClick) {
-        const btn = document.createElement("button");
-        btn.innerText = text;
-        Object.assign(btn.style, {
-            padding: "10px",
-            background: "rgba(124, 18, 247, 0.1)",
-            border: "1px solid #7c12f7",
-            color: "#fff",
-            cursor: "pointer",
-            fontSize: "10px",
-            fontWeight: "bold",
-            transition: "all 0.2s ease",
-            borderRadius: "4px"
+    function buildBtn(text, color, action) {
+        const b = document.createElement("button");
+        b.innerText = text;
+        Object.assign(b.style, {
+            padding: "12px", background: "rgba(0,0,0,0.5)", border: `2px solid ${color}`,
+            color: "#fff", cursor: "pointer", fontSize: "10px", fontWeight: "900", transition: "0.3s"
         });
-
-        btn.onmouseenter = () => {
-            btn.style.background = "#7c12f7";
-            btn.style.boxShadow = "0 0 10px #7c12f7";
-        };
-        btn.onmouseleave = () => {
-            btn.style.background = "rgba(124, 18, 247, 0.1)";
-            btn.style.boxShadow = "none";
-        };
-
-        btn.onclick = onClick;
-        return btn;
+        b.onmouseenter = () => { b.style.background = color; b.style.color = "#000"; };
+        b.onmouseleave = () => { b.style.background = "transparent"; b.style.color = "#fff"; };
+        b.onclick = action;
+        return b;
     }
 
-    // Toggle Clarity
-    const clarityBtn = createSystemButton("CLARITY BOOST", () => {
-        const current = masterClarityEq.gain.value;
-        masterClarityEq.gain.value = current === 5 ? 0 : 5;
-        clarityBtn.style.borderColor = masterClarityEq.gain.value === 5 ? "#00e5ff" : "#7c12f7";
-    });
-
-    // Dark Mode Toggle
-    const darkBtn = createSystemButton("DARK MODE", () => {
-        const isDark = document.body.style.filter === "brightness(0.6)";
-        document.body.style.filter = isDark ? "" : "brightness(0.6)";
-        darkBtn.style.borderColor = !isDark ? "#00e5ff" : "#7c12f7";
-    });
-
-    // Sidebar Toggle
-    const sidebarBtn = createSystemButton("TOGGLE SIDEBAR", () => {
-        const sidebars = document.querySelectorAll('[class*="sidebar"]');
-        sidebars.forEach(s => {
-            s.style.display = s.style.display === "none" ? "" : "none";
-        });
-    });
-
-    // Reset All
-    const resetBtn = createSystemButton("RELOAD / RESET", () => {
-        location.reload();
-    });
-
-    systemGrid.append(clarityBtn, darkBtn, sidebarBtn, resetBtn);
-    panel.appendChild(systemGrid);
+    grid.append(
+        buildBtn("REBOOT ENGINE", "#ffffff", () => location.reload()),
+        buildBtn("DARK VISION", "#0000ff", () => {
+            document.body.style.filter = document.body.style.filter ? "" : "brightness(0.6) contrast(1.1)";
+        }),
+        buildBtn("HIDE INTERFACE", "#ff0000", () => {
+            document.querySelectorAll('[class*="sidebar"]').forEach(s => s.style.display = s.style.display === "none" ? "" : "none");
+        }),
+        buildBtn("CLARITY TOGGLE", "#00ff00", () => {
+            highDefClarity.gain.value = highDefClarity.gain.value > 0 ? 0 : 12;
+        })
+    );
+    panel.appendChild(grid);
 
     // ==========================================
-    // 8. AUDIO HOOKING LOGIC
+    // 8. STABLE AUDIO HOOKING (DYNAMIC CHECK)
     // ==========================================
-    function applyAudioHook() {
-        const elements = document.querySelectorAll("audio, video");
-        elements.forEach(media => {
-            if (!media._omniAttached) {
+    function hookMedia() {
+        const media = document.querySelectorAll("audio, video");
+        media.forEach(item => {
+            if (!item._nocturnalHooked) {
                 try {
-                    const source = audioCtx.createMediaElementSource(media);
-                    source.connect(masterClarityEq);
-                    media._omniAttached = true;
-                    console.log("[Nocturnal Omni] Successfully hooked a new media element.");
-                } catch (err) {
-                    // This error usually happens if the element is already connected
+                    const stream = audioCtx.createMediaElementSource(item);
+                    stream.connect(highDefClarity);
+                    item._nocturnalHooked = true;
+                    console.log("%c[Nocturnal Omni] Audio Stream Secured", "color: #00ff00;");
+                } catch (e) {
+                    // Element likely already connected by Discord
                 }
             }
         });
     }
 
-    // Continuously check for new audio elements (Discord dynamic loading)
-    const hookInterval = setInterval(applyAudioHook, 2500);
+    // Run hook every 2 seconds to catch new voice streams/videos
+    setInterval(hookMedia, 2000);
 
     // ==========================================
-    // 9. PANEL DRAGGABILITY
+    // 9. INTERACTIVE DRAG LOGIC
     // ==========================================
-    panel.onmousedown = function(event) {
-        if (event.target.tagName === "INPUT" || event.target.tagName === "BUTTON") return;
+    panel.onmousedown = (e) => {
+        if (e.target.tagName === "INPUT" || e.target.tagName === "BUTTON") return;
+        let startX = e.clientX - panel.offsetLeft;
+        let startY = e.clientY - panel.offsetTop;
+        
+        const onMouseMove = (ev) => {
+            panel.style.left = ev.pageX - startX + 'px';
+            panel.style.top = ev.pageY - startY + 'px';
+        };
 
-        let shiftX = event.clientX - panel.getBoundingClientRect().left;
-        let shiftY = event.clientY - panel.getBoundingClientRect().top;
-
-        function moveAt(pageX, pageY) {
-            panel.style.left = pageX - shiftX + 'px';
-            panel.style.top = pageY - shiftY + 'px';
-        }
-
-        function onMouseMove(event) {
-            moveAt(event.pageX, event.pageY);
-        }
-
-        document.addEventListener('mousemove', onMouseMove);
-
-        document.onmouseup = function() {
-            document.removeEventListener('mousemove', onMouseMove);
+        document.addEventListener("mousemove", onMouseMove);
+        document.onmouseup = () => {
+            document.removeEventListener("mousemove", onMouseMove);
             document.onmouseup = null;
         };
     };
 
-    panel.ondragstart = function() { return false; };
-
-    console.log("[Nocturnal Omni] Full UI and Audio Chain established.");
+    console.log("%c[Nocturnal Omni] Titan V7 Online.", "color: #00ff00; font-weight: bold;");
 })();
