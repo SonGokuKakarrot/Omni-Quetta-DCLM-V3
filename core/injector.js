@@ -36,6 +36,7 @@
     senderRecords: new Set(),
     senderBySender: new WeakMap(),
     refreshingSenders: new WeakSet(),
+    recoverTimers: new Set(),
     lastAudioConstraints: { audio: true }
   };
 
@@ -125,6 +126,16 @@
     for (const pipeline of state.pipelines) applyPipeline(pipeline, inputConfig);
   }
 
+  function resumePipeline(pipeline) {
+    const ctx = pipeline?.ctx;
+    if (!ctx || ctx.state === "closed" || typeof ctx.resume !== "function") return;
+    if (ctx.state !== "running") ctx.resume().catch(() => {});
+  }
+
+  function resumeAllPipelines() {
+    for (const pipeline of state.pipelines) resumePipeline(pipeline);
+  }
+
   function createAudioContext() {
     const AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return null;
@@ -196,7 +207,7 @@
     applyPipeline(pipeline, inputConfig);
     state.pipelines.add(pipeline);
 
-    if (ctx.state === "suspended") ctx.resume().catch(() => {});
+    resumePipeline(pipeline);
 
     const outAudioTracks = dst.stream.getAudioTracks();
     outAudioTracks.forEach((track) => {
@@ -253,6 +264,21 @@
   function liveAudioTrack(stream) {
     if (!stream || typeof stream.getAudioTracks !== "function") return null;
     return stream.getAudioTracks().find((track) => track.readyState !== "ended") || null;
+  }
+
+  function processedSourceIsLive(track) {
+    if (!track || !state.processedTracks.has(track)) return true;
+    const meta = state.processedMeta.get(track);
+    if (!meta) return true;
+    resumePipeline(meta.pipeline);
+    return Boolean(liveAudioTrack(meta.source));
+  }
+
+  function trackNeedsRefresh(track) {
+    if (!track || track.kind !== "audio") return true;
+    if (track.readyState === "ended") return true;
+    if (!state.processedTracks.has(track)) return true;
+    return !processedSourceIsLive(track);
   }
 
   function rebuildProcessedTrack(track) {
@@ -332,16 +358,23 @@
     }
   }
 
-  function rememberSender(sender, track) {
+  function rememberSender(sender, track, pc = null) {
     if (!sender) return null;
     let record = state.senderBySender.get(sender);
     if (!record) {
-      record = { sender, track: null };
+      record = { sender, track: null, pc: null };
       state.senderBySender.set(sender, record);
       state.senderRecords.add(record);
     }
     if (track) record.track = track;
+    if (pc) record.pc = pc;
     return record;
+  }
+
+  function recordIsClosed(record) {
+    const pc = record?.pc;
+    if (!pc) return false;
+    return ["closed", "failed"].includes(pc.connectionState || pc.iceConnectionState || "");
   }
 
   async function reacquireProcessedTrackForSender() {
@@ -361,12 +394,16 @@
     if (!sender || typeof sender.replaceTrack !== "function") return null;
     rememberSender(sender, track);
     const current = track || sender.track;
-    let replacement = current?.readyState === "ended" ? cloneForSender(current) : current;
+    let replacement = null;
 
-    if (!replacement || replacement.readyState === "ended") {
+    if (current && current.kind === "audio" && !trackNeedsRefresh(current)) {
+      replacement = current;
+    } else if (current && current.kind === "audio" && current.readyState !== "ended" && !state.processedTracks.has(current)) {
+      replacement = processAudioTrack(current, true);
+    }
+
+    if (!replacement || trackNeedsRefresh(replacement)) {
       replacement = await reacquireProcessedTrackForSender();
-    } else if (cfg().enabled && replacement.kind === "audio" && !state.processedTracks.has(replacement)) {
-      replacement = processAudioTrack(replacement, true);
     }
 
     if (!replacement || replacement.readyState === "ended") return null;
@@ -382,6 +419,7 @@
   }
 
   function queueSenderRefresh(sender, track) {
+    resumeAllPipelines();
     if (!sender || state.refreshingSenders.has(sender)) return;
     state.refreshingSenders.add(sender);
     setTimeout(() => {
@@ -397,8 +435,22 @@
     track.addEventListener("ended", () => queueSenderRefresh(sender, track), { once: true });
   }
 
+  function scheduleRecoveryPasses() {
+    for (const timer of state.recoverTimers) clearTimeout(timer);
+    state.recoverTimers.clear();
+    [0, 150, 500, 1200, 2500].forEach((delay) => {
+      const timer = setTimeout(() => {
+        state.recoverTimers.delete(timer);
+        resumeAllPipelines();
+        reconcileLiveSenders();
+      }, delay);
+      state.recoverTimers.add(timer);
+    });
+  }
+
   function reconcileLiveSenders() {
     if (!cfg().enabled) return;
+    resumeAllPipelines();
 
     for (const pc of [...state.peerConnections]) {
       if (typeof pc.getSenders !== "function") continue;
@@ -411,10 +463,14 @@
     }
 
     for (const record of [...state.senderRecords]) {
+      if (recordIsClosed(record)) {
+        state.senderRecords.delete(record);
+        continue;
+      }
       const sender = record.sender;
       const track = sender?.track || record.track;
       if (!sender || !track || track.kind !== "audio") continue;
-      if (track.readyState === "ended" || !state.processedTracks.has(track)) {
+      if (trackNeedsRefresh(track)) {
         queueSenderRefresh(sender, track);
       } else {
         tuneAudioSender(sender);
@@ -437,7 +493,7 @@
               : [new MediaStream([processedTrack])];
             const sender = originalAddTrack.call(this, processedTrack, ...patchedStreams);
             tuneAudioSender(sender);
-            rememberSender(sender, processedTrack);
+            rememberSender(sender, processedTrack, this);
             if (typeof sender?.replaceTrack === "function") watchSenderTrack(sender, processedTrack);
             return sender;
           }
@@ -456,7 +512,7 @@
               : init;
             const transceiver = originalAddTransceiver.call(this, processedTrack, patchedInit);
             tuneAudioSender(transceiver?.sender);
-            rememberSender(transceiver?.sender, processedTrack);
+            rememberSender(transceiver?.sender, processedTrack, this);
             if (typeof transceiver?.sender?.replaceTrack === "function") watchSenderTrack(transceiver.sender, processedTrack);
             return transceiver;
           }
@@ -525,7 +581,15 @@
     if (event.source !== window || !event.data || event.data.type !== MSG_CFG) return;
     state.config = cfg(event.data.payload);
     updateAllPipelines(state.config);
-    reconcileLiveSenders();
+    scheduleRecoveryPasses();
+  });
+
+  ["focus", "pageshow", "online", "pointerdown", "touchstart"].forEach((type) => {
+    window.addEventListener(type, scheduleRecoveryPasses, { passive: true });
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) scheduleRecoveryPasses();
   });
 
   setInterval(reconcileLiveSenders, 2000);
